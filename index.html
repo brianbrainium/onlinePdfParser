@@ -115,7 +115,15 @@
             }
             displayOutline(outline, outputDiv);
         });
+
+        // Display approximate device memory in the footer
+        document.addEventListener('DOMContentLoaded', () => {
+            const mem = navigator.deviceMemory;
+            const memEl = document.getElementById('memory');
+            if (memEl) {
+                memEl.textContent = mem ? `Approx. ${mem} GB RAM` : 'Memory: unknown';
+            }
+        });
     </script>
-    <footer id="version" style="margin-top:20px;">Version 0.1.0</footer>
 </body>
 </html>

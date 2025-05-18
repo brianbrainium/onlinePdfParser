@@ -1,4 +1,5 @@
 # Features
+This file lists potential features along with their current implementation status. See [roadmap.md](roadmap.md) for the planned order of development.
 
 - [x] **Client-side PDF upload** – File input works in-browser (drag-and-drop not implemented)
 - [ ] **Browser-memory check & size advice** – Not implemented

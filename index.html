@@ -35,6 +35,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
     <script>
+        function warnIfLargePDF(file) {
+            const progress = document.getElementById('progress');
+            progress.textContent = '';
+            if (!file) return;
+            const memGB = navigator.deviceMemory || 4;
+            const limit = memGB * 1024 * 1024 * 1024 * 0.25;
+            if (file.size > limit) {
+                progress.textContent = 'Warning: large file may exceed available memory. Consider splitting the PDF before upload.';
+            }
+        }
+
+        document.getElementById('pdfFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            warnIfLargePDF(file);
+        });
         async function readOutline(pdf) {
             // Use PDF.js to read the outline/table of contents
             const pdfData = new Uint8Array(await pdf.arrayBuffer());
@@ -92,6 +107,7 @@
             outputDiv.innerHTML = '';
             if (!fileInput.files.length) return;
             const file = fileInput.files[0];
+            warnIfLargePDF(file);
             const outline = await readOutline(file);
             if (!outline.length) {
                 outputDiv.textContent = 'No outline found.';
@@ -99,6 +115,19 @@
             }
             displayOutline(outline, outputDiv);
         });
+
+        // Display approximate device memory in the footer
+        document.addEventListener('DOMContentLoaded', () => {
+            const mem = navigator.deviceMemory;
+            const memEl = document.getElementById('memory');
+            if (memEl) {
+                memEl.textContent = mem ? `Approx. ${mem} GB RAM` : 'Memory: unknown';
+            }
+        });
     </script>
+    <footer style="margin-top:20px;">
+        <span id="version">Version 0.1.0</span> |
+        <span id="memory"></span>
+    </footer>
 </body>
 </html>

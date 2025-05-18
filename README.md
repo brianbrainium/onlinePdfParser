@@ -12,5 +12,3 @@ PDF files.
 Note: Some features from the original Python version (such as accurate page
 range detection or text extraction) are simplified or marked as TODO in the
 JavaScript version.
-
-For a full list of features, see [docs/features.md](docs/features.md). Project changes are tracked in [CHANGELOG.md](CHANGELOG.md).

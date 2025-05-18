@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 ## [Unreleased]
 - Added a features document under `docs/`.
 - Established this changelog.
+- Updated the feature list with status markers for each entry.
 
 ## [0.1.0] - 2025-05-18
 ### Added

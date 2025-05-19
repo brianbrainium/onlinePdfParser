@@ -36,6 +36,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+            `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+
         function warnIfLargePDF(file) {
             const progress = document.getElementById('progress');
             progress.textContent = '';

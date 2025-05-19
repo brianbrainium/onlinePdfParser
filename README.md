@@ -14,5 +14,10 @@ The browser version now supports exporting each section as either PDF or
 plain text, and can automatically iterate through all sections to export
 them into a ZIP archive that mirrors the document outline.
 
+For a minimal demonstration of the ZIP download logic on its own, open
+`ziptest.html` in your browser. This small page creates a test archive
+when you click the **Make ZIP** button, allowing you to verify that the
+JSZip-based download works independently from the main application.
+
 For the current status of planned functionality, see [docs/features.md](docs/features.md). A tentative implementation sequence is outlined in [docs/roadmap.md](docs/roadmap.md).
 

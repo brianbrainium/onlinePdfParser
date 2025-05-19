@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZIP Test</title>
+</head>
+<body>
+    <h1>ZIP Download Test</h1>
+    <button id="makeZip">Make ZIP</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        document.getElementById('makeZip').addEventListener('click', async () => {
+            const zip = new JSZip();
+            zip.file('hello.txt', 'Hello from JSZip!');
+            zip.file('folder/nested.txt', 'Nested file');
+            const blob = await zip.generateAsync({ type: 'blob' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'test.zip';
+            a.click();
+        });
+    </script>
+</body>
+</html>

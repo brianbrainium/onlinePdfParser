@@ -50,13 +50,45 @@
             const file = e.target.files[0];
             warnIfLargePDF(file);
         });
+        let pdfjsDoc = null;
+        async function resolveDest(doc, dest) {
+            if (typeof dest === 'string') {
+                dest = await doc.getDestination(dest);
+            }
+            return dest || null;
+        }
+
+        async function annotateOutline(doc, items, flat) {
+            for (const it of items) {
+                const resolved = it.dest ? await resolveDest(doc, it.dest) : null;
+                if (resolved) {
+                    try {
+                        it.pageIndex = await doc.getPageIndex(resolved[0]);
+                    } catch (e) {
+                        it.pageIndex = null;
+                    }
+                }
+                if (it.items && it.items.length) {
+                    await annotateOutline(doc, it.items, flat);
+                }
+                flat.push(it);
+            }
+        }
+
         async function readOutline(pdf) {
-            // Use PDF.js to read the outline/table of contents
             const pdfData = new Uint8Array(await pdf.arrayBuffer());
             const loadingTask = pdfjsLib.getDocument({ data: pdfData });
             const doc = await loadingTask.promise;
-            const outline = await doc.getOutline();
-            return outline || [];
+            pdfjsDoc = doc;
+            const outline = await doc.getOutline() || [];
+            const flat = [];
+            await annotateOutline(doc, outline, flat);
+            flat.sort((a, b) => (a.pageIndex ?? Infinity) - (b.pageIndex ?? Infinity));
+            for (let i = 0; i < flat.length; i++) {
+                const next = flat[i + 1];
+                flat[i].endPageIndex = next && next.pageIndex != null ? next.pageIndex : doc.numPages;
+            }
+            return outline;
         }
 
         function displayOutline(outline, container, prefix = '') {
@@ -65,7 +97,7 @@
                 const li = document.createElement('li');
                 const title = item.title || '<no title>';
                 li.textContent = prefix + title;
-                if (item.dest) {
+                if (item.pageIndex != null) {
                     const btn = document.createElement('button');
                     btn.textContent = 'Extract';
                     btn.onclick = () => extractSection(item);
@@ -86,10 +118,10 @@
             const file = fileInput.files[0];
             const arrayBuffer = await file.arrayBuffer();
             const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
-            const pageIndex = (item.dest[0].num || 0); // TODO: verify index resolution
-            const nextPage = item.next ? (item.next.dest[0].num || pdfDoc.getPageCount()) : pdfDoc.getPageCount();
+            const start = item.pageIndex || 0;
+            const end = item.endPageIndex || pdfDoc.getPageCount();
             const newDoc = await PDFLib.PDFDocument.create();
-            for (let i = pageIndex; i < nextPage; i++) {
+            for (let i = start; i < end; i++) {
                 const [copied] = await newDoc.copyPages(pdfDoc, [i]);
                 newDoc.addPage(copied);
             }

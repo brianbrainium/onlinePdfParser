@@ -6,7 +6,7 @@ This file lists potential features along with their current implementation statu
 - [ ] **Upload progress bar** – Not implemented
 - [x] **TOC parsing** – Read the PDF outline to build the document hierarchy
 - [ ] **Collapsible TOC tree view** – Not implemented
-- [x] **Per-section "Extract" action** – Export a single chosen section
+- [x] **Per-section "Extract" action** – Export a single chosen section (page range calculation fixed)
 - [ ] **Multi-select / bulk selection** – Not implemented
 - [ ] **Export format choice** – UI offers PDF or text, but only PDF output is implemented
 - [ ] **Full-document "iterate all" option** – Not implemented

@@ -34,6 +34,7 @@
     <!-- PDF.js and pdf-lib from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>
         function warnIfLargePDF(file) {
             const progress = document.getElementById('progress');
@@ -58,8 +59,9 @@
             return dest || null;
         }
 
-        async function annotateOutline(doc, items, flat) {
+        async function annotateOutline(doc, items, flat, parent = null) {
             for (const it of items) {
+                it.parent = parent;
                 const resolved = it.dest ? await resolveDest(doc, it.dest) : null;
                 if (resolved) {
                     try {
@@ -69,7 +71,7 @@
                     }
                 }
                 if (it.items && it.items.length) {
-                    await annotateOutline(doc, it.items, flat);
+                    await annotateOutline(doc, it.items, flat, it);
                 }
                 flat.push(it);
             }
@@ -88,7 +90,7 @@
                 const next = flat[i + 1];
                 flat[i].endPageIndex = next && next.pageIndex != null ? next.pageIndex : doc.numPages;
             }
-            return outline;
+            return { outline, flat };
         }
 
         function displayOutline(outline, container, prefix = '') {
@@ -155,6 +157,69 @@
             }
         }
 
+        function sanitizePart(text) {
+            return text.replace(/[^a-z0-9_\-]+/gi, '_').substring(0, 50) || 'section';
+        }
+
+        function buildPath(item) {
+            const parts = [];
+            let cur = item;
+            while (cur) {
+                parts.unshift(sanitizePart(cur.title || 'section'));
+                cur = cur.parent;
+            }
+            return parts.join('/');
+        }
+
+        async function iterateAllSections(flat) {
+            const format = document.querySelector('input[name="format"]:checked').value;
+            const fileInput = document.getElementById('pdfFile');
+            if (!fileInput.files.length) return;
+            const file = fileInput.files[0];
+            const zip = new JSZip();
+
+            if (format === 'pdf') {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+                for (const item of flat) {
+                    if (item.pageIndex == null) continue;
+                    const start = item.pageIndex;
+                    const end = item.endPageIndex || pdfDoc.getPageCount();
+                    const newDoc = await PDFLib.PDFDocument.create();
+                    for (let i = start; i < end; i++) {
+                        const [copied] = await newDoc.copyPages(pdfDoc, [i]);
+                        newDoc.addPage(copied);
+                    }
+                    const bytes = await newDoc.save();
+                    zip.file(buildPath(item) + '.pdf', bytes);
+                }
+            } else {
+                if (!pdfjsDoc) {
+                    const data = new Uint8Array(await file.arrayBuffer());
+                    pdfjsDoc = await pdfjsLib.getDocument({ data }).promise;
+                }
+                for (const item of flat) {
+                    if (item.pageIndex == null) continue;
+                    const start = item.pageIndex;
+                    const end = item.endPageIndex || pdfjsDoc.numPages;
+                    let text = '';
+                    for (let i = start + 1; i <= end; i++) {
+                        const page = await pdfjsDoc.getPage(i);
+                        const content = await page.getTextContent();
+                        const pageText = content.items.map(t => t.str).join(' ');
+                        text += pageText + '\n';
+                    }
+                    zip.file(buildPath(item) + '.txt', text);
+                }
+            }
+
+            const blob = await zip.generateAsync({ type: 'blob' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'sections.zip';
+            a.click();
+        }
+
         document.getElementById('processBtn').addEventListener('click', async () => {
             const fileInput = document.getElementById('pdfFile');
             const outputDiv = document.getElementById('output');
@@ -162,15 +227,18 @@
             if (!fileInput.files.length) return;
             const file = fileInput.files[0];
             warnIfLargePDF(file);
-            const outline = await readOutline(file);
+            const { outline, flat } = await readOutline(file);
             if (!outline.length) {
                 outputDiv.textContent = 'No outline found.';
                 return;
             }
             displayOutline(outline, outputDiv);
+            if (document.getElementById('iterateAll').checked) {
+                await iterateAllSections(flat);
+            }
         });
 
-        const APP_VERSION = '0.1.0';
+        const APP_VERSION = '0.2.0';
 
         // Display version and approximate device memory in the footer
         document.addEventListener('DOMContentLoaded', () => {

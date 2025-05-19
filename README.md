@@ -11,7 +11,8 @@ PDF files.
 
 Note: Some features from the original Python version are simplified.
 The browser version now supports exporting each section as either PDF or
-plain text.
+plain text, and can automatically iterate through all sections to export
+them into a ZIP archive that mirrors the document outline.
 
 For the current status of planned functionality, see [docs/features.md](docs/features.md). A tentative implementation sequence is outlined in [docs/roadmap.md](docs/roadmap.md).
 

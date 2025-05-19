@@ -148,14 +148,24 @@
             displayOutline(outline, outputDiv);
         });
 
-        // Display approximate device memory in the footer
+        const APP_VERSION = '0.1.0';
+
+        // Display version and approximate device memory in the footer
         document.addEventListener('DOMContentLoaded', () => {
             const mem = navigator.deviceMemory;
             const memEl = document.getElementById('memory');
             if (memEl) {
                 memEl.textContent = mem ? `Approx. ${mem} GB RAM` : 'Memory: unknown';
             }
+            const versionEl = document.getElementById('version');
+            if (versionEl) {
+                versionEl.textContent = `Version ${APP_VERSION}`;
+            }
         });
     </script>
+    <footer style="margin-top:20px;">
+        <span id="version"></span> |
+        <span id="memory"></span>
+    </footer>
 </body>
 </html>

@@ -65,6 +65,7 @@
         async function annotateOutline(doc, items, flat, parent = null) {
             for (const it of items) {
                 it.parent = parent;
+                it.level = parent ? (parent.level || 0) + 1 : 0;
                 const resolved = it.dest ? await resolveDest(doc, it.dest) : null;
                 if (resolved) {
                     try {
@@ -90,8 +91,17 @@
             await annotateOutline(doc, outline, flat);
             flat.sort((a, b) => (a.pageIndex ?? Infinity) - (b.pageIndex ?? Infinity));
             for (let i = 0; i < flat.length; i++) {
-                const next = flat[i + 1];
-                flat[i].endPageIndex = next && next.pageIndex != null ? next.pageIndex : doc.numPages;
+                const cur = flat[i];
+                let end = doc.numPages;
+                for (let j = i + 1; j < flat.length; j++) {
+                    const next = flat[j];
+                    if (next.pageIndex == null) continue;
+                    if ((next.level ?? 0) <= (cur.level ?? 0)) {
+                        end = next.pageIndex;
+                        break;
+                    }
+                }
+                cur.endPageIndex = end;
             }
             return { outline, flat };
         }

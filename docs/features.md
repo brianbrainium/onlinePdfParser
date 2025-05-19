@@ -9,5 +9,5 @@ This file lists potential features along with their current implementation statu
 - [x] **Per-section "Extract" action** – Export a single chosen section (page range calculation fixed)
 - [ ] **Multi-select / bulk selection** – Not implemented
 - [x] **Export format choice** – Text output added alongside PDF export
-- [ ] **Full-document "iterate all" option** – Not implemented
-- [ ] **Zip export with TOC-based folder structure** – Not implemented
+- [x] **Full-document "iterate all" option** – Implemented for both PDF and text outputs
+- [x] **Zip export with TOC-based folder structure** – Implemented using JSZip

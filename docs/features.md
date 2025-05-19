@@ -8,6 +8,6 @@ This file lists potential features along with their current implementation statu
 - [ ] **Collapsible TOC tree view** – Not implemented
 - [x] **Per-section "Extract" action** – Export a single chosen section (page range calculation fixed)
 - [ ] **Multi-select / bulk selection** – Not implemented
-- [ ] **Export format choice** – UI offers PDF or text, but only PDF output is implemented
+- [x] **Export format choice** – Text output added alongside PDF export
 - [ ] **Full-document "iterate all" option** – Not implemented
 - [ ] **Zip export with TOC-based folder structure** – Not implemented

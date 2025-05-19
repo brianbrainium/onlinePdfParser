@@ -9,9 +9,9 @@ The implementation uses [PDF.js](https://mozilla.github.io/pdf.js/) for reading
 the outline and [pdf-lib](https://github.com/Hopding/pdf-lib) for writing new
 PDF files.
 
-Note: Some features from the original Python version (such as accurate page
-range detection or text extraction) are simplified or marked as TODO in the
-JavaScript version.
+Note: Some features from the original Python version are simplified.
+The browser version now supports exporting each section as either PDF or
+plain text.
 
 For the current status of planned functionality, see [docs/features.md](docs/features.md). A tentative implementation sequence is outlined in [docs/roadmap.md](docs/roadmap.md).
 

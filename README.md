@@ -21,3 +21,6 @@ JSZip-based download works independently from the main application.
 
 For the current status of planned functionality, see [docs/features.md](docs/features.md). A tentative implementation sequence is outlined in [docs/roadmap.md](docs/roadmap.md).
 
+## License
+
+This project is licensed under the [MIT License](LICENSE).
